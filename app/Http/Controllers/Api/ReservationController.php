@@ -78,6 +78,6 @@ class ReservationController extends Controller
             return response()->json(['message' => 'Hozzáférés megtagadva!'], 403);
         }
             $reservation->delete();
-            return response()->json(['message'=>'Foglalás törölve'],200);
+            return response()->json(['message'=>'Foglalás törölve.'],200);
     }
 }
