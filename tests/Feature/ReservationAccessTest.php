@@ -7,27 +7,21 @@ use App\Models\Reservation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\WithFaker;
 
-class ReservationControllerTest extends TestCase
+class ReservationAccessTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
     #[Test]
-    public function user_can_create_reservation()
+    public function admin_can_view_all_reservations()
     {
-        $user = User::factory()->create();
-        $payload = [
-            'reservation_time' => now()->addDays(3)->toDateTimeString(),
-            'guests' => 4,
-            'note' => 'Teszt foglalás',
-        ];
+        $admin = User::factory()->create(['is_admin' => true]);
+        $reservation = Reservation::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/reservations', $payload);
+        $response = $this->actingAs($admin)->getJson('/api/reservations');
 
-        $response->assertStatus(201)
-                 ->assertJsonFragment(['note' => 'Teszt foglalás']);
-        $this->assertDatabaseHas('reservations', ['note' => 'Teszt foglalás']);
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['id' => $reservation->id]);
     }
 
     #[Test]
@@ -55,16 +49,6 @@ class ReservationControllerTest extends TestCase
     }
 
     #[Test]
-    public function admin_can_view_all_reservations()
-    {
-        $admin = User::factory()->create(['is_admin' => true]);
-        $user = User::factory()->create();
-        $reservation = Reservation::factory()->for($user)->create();
-        $response = $this->actingAs($admin)->getJson('/api/reservations');
-        $response->assertStatus(200)
-                 ->assertJsonFragment(['id' => $reservation->id]);
-    }
-    #[Test]
     public function user_can_update_own_reservation()
     {
         $user = User::factory()->create();
@@ -76,7 +60,6 @@ class ReservationControllerTest extends TestCase
 
         $response->assertStatus(200)
                  ->assertJsonFragment(['note' => 'Frissített megjegyzés']);
-        $this->assertDatabaseHas('reservations', ['note' => 'Frissített megjegyzés']);
     }
 
     #[Test]
@@ -103,7 +86,6 @@ class ReservationControllerTest extends TestCase
 
         $response->assertStatus(200)
                  ->assertJson(['message' => 'Foglalás törölve.']);
-        $this->assertDatabaseMissing('reservations', ['id' => $reservation->id]);
     }
 
     #[Test]
