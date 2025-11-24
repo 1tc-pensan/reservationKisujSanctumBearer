@@ -53,9 +53,20 @@ class AutControllerTest extends TestCase
             $response = $this->postJson('/api/login', $credentials);
             $response->assertStatus(200)->assertJsonStructure(['access_token','token_type']);
     }
-    // #[Test]
-    // public function user_can_logout()
-    // {
+    #[Test]
+    public function user_can_logout()
+    {
+        //Arrange
+        $user = User::factory()->create();
+        $token = $user->createToken('auth_token');
+        //Act
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token->plainTextToken,
+        ])->postJson('/api/logout');
+        //Assert
+        $response->assertStatus(200)->assertJson([
+            'message' => 'Successfully logged out'
+        ]);
 
-    // }
+    }
 }
