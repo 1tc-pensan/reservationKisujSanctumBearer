@@ -11,7 +11,7 @@ Content-Type: application/json
 Változók a kollekcióban:
 
 Változó	Érték
-base_url	https://template.postman-echo.com
+base_url	http:\\localhost/reservationKisujSanctumBearer/public/api
 id	1
 1. Teszt – Hello Endpoint
 
